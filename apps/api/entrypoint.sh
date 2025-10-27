@@ -11,10 +11,21 @@ while ! pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER > /dev/
 done
 echo "✅ PostgreSQL is ready!"
 
+# Create database if it doesn't exist
+echo "🔧 Ensuring database exists..."
+PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -tc "SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB'" | grep -q 1 || \
+PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -c "CREATE DATABASE $POSTGRES_DB"
+echo "✅ Database ready!"
+
 # Run database migrations (from apps/api directory)
 echo "🔄 Running database migrations..."
-alembic upgrade head
+echo "  📂 Current directory: $(pwd)"
+echo "  📄 Alembic config: $(ls -la alembic.ini 2>&1 || echo 'Not found')"
+alembic -c /app/apps/api/alembic.ini upgrade head
 echo "✅ Migrations completed!"
+
+# Change to the API directory
+cd /app/apps/api
 
 # Start the application with reload for development
 echo "🌟 Starting FastAPI application..."

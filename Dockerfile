@@ -2,13 +2,22 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Install system dependencies including PostgreSQL client
+# Install system dependencies including PostgreSQL client and document processing libraries
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     curl \
     postgresql-client \
     libpq-dev \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libgomp1 \
+    poppler-utils \
+    tesseract-ocr \
+    libreoffice \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file from root
